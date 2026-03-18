@@ -194,7 +194,7 @@ fun ArtistScreen(
 											modifier = Modifier
 												.heightIn(min = 32.dp)
 												.padding(top = 8.dp)
-												.padding(horizontal = 20.dp)
+												.padding(horizontal = 16.dp)
 												.fillMaxWidth()
 										)
 										LazyHorizontalGrid(
@@ -211,7 +211,7 @@ fun ArtistScreen(
 									}
 								state.artist.album.let { albums ->
 									ArtCarousel(
-										Res.string.title_albums,
+										stringResource(Res.string.title_albums),
 										albums.sortedByDescending { it.playCount }
 									) { album ->
 										ArtCarouselItem(album.coverArtId, album.name) {

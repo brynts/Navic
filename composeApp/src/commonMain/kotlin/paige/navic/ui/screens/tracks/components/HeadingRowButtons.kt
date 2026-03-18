@@ -30,7 +30,7 @@ fun TracksScreenHeadingRowButtons(
 ) {
 	val player = LocalMediaPlayer.current
 	Row(
-		modifier = Modifier.padding(horizontal = 15.dp, vertical = 10.dp),
+		modifier = Modifier.padding(horizontal = 31.dp, vertical = 10.dp),
 		horizontalArrangement = Arrangement.spacedBy(
 			10.dp,
 			alignment = Alignment.CenterHorizontally

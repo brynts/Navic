@@ -21,7 +21,7 @@ fun LazyListScope.tracksScreenTrackRowPlaceholder(
 	val rowCount = rowCount ?: 10
 	item {
 		Row(
-			modifier = Modifier.padding(horizontal = 15.dp, vertical = 15.dp),
+			modifier = Modifier.padding(horizontal = 31.dp, vertical = 31.dp),
 			horizontalArrangement = Arrangement.spacedBy(
 				10.dp,
 				alignment = Alignment.CenterHorizontally
@@ -34,7 +34,11 @@ fun LazyListScope.tracksScreenTrackRowPlaceholder(
 	items(rowCount) { idx ->
 		Box(
 			modifier = Modifier
-				.padding(bottom = 3.dp)
+				.padding(
+					bottom = 3.dp,
+					start = 16.dp,
+					end = 16.dp
+				)
 				.clip(
 					if (rowCount == 1) {
 						ContinuousRoundedRectangle(18.dp)

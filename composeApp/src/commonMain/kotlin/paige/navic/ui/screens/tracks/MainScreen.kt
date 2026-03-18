@@ -28,10 +28,12 @@ import paige.navic.LocalMediaPlayer
 import paige.navic.ui.components.common.ErrorBox
 import paige.navic.ui.components.dialogs.ShareDialog
 import paige.navic.ui.screens.tracks.components.TrackRowDropdown
+import paige.navic.ui.screens.tracks.components.TracksScreenFooterRow
 import paige.navic.ui.screens.tracks.components.TracksScreenHeadingRow
 import paige.navic.ui.screens.tracks.components.TracksScreenHeadingRowButtons
 import paige.navic.ui.screens.tracks.components.TracksScreenTopBar
 import paige.navic.ui.screens.tracks.components.TracksScreenTrackRow
+import paige.navic.ui.screens.tracks.components.tracksScreenMoreByArtistRow
 import paige.navic.ui.screens.tracks.components.tracksScreenTrackRowPlaceholder
 import paige.navic.ui.viewmodels.TracksViewModel
 import paige.navic.utils.UiState
@@ -59,6 +61,7 @@ fun TracksScreen(
 
 	val albumInfoState by viewModel.albumInfoState.collectAsState()
 	val starredState by viewModel.starredState.collectAsState()
+	val artistState by viewModel.artistState.collectAsState()
 
 	SharedTransitionLayout {
 		Scaffold(
@@ -76,8 +79,12 @@ fun TracksScreen(
 				modifier = Modifier
 					.padding(top = contentPadding.calculateTopPadding())
 					.background(MaterialTheme.colorScheme.surface),
-				isRefreshing = tracks is UiState.Loading,
-				onRefresh = { viewModel.refreshTracks() }
+				isRefreshing = tracks is UiState.Loading
+					|| artistState is UiState.Loading,
+				onRefresh = {
+					viewModel.refreshTracks()
+					viewModel.refreshArtist()
+				}
 			) {
 				LazyColumn(
 					modifier = Modifier
@@ -86,9 +93,7 @@ fun TracksScreen(
 						.fadeFromTop(),
 					horizontalAlignment = Alignment.CenterHorizontally,
 					contentPadding = contentPadding.withoutTop() + PaddingValues(
-						top = 16.dp,
-						end = 16.dp,
-						start = 16.dp
+						top = 16.dp
 					),
 					state = viewModel.listState
 				) {
@@ -142,6 +147,14 @@ fun TracksScreen(
 							)
 						}
 					}
+
+					item { TracksScreenFooterRow(partialTracks) }
+
+					tracksScreenMoreByArtistRow(
+						partialTracks = partialTracks,
+						artistState = artistState,
+						tab = tab
+					)
 				}
 			}
 		}

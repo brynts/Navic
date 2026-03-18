@@ -29,7 +29,11 @@ fun TracksScreenTrackRow(
 	onLongClick: (() -> Unit)
 ) {
 	SegmentedListItem(
-		modifier = Modifier.padding(bottom = ListItemDefaults.SegmentedGap),
+		modifier = Modifier.padding(
+			start = 16.dp,
+			end = 16.dp,
+			bottom = ListItemDefaults.SegmentedGap
+		),
 		onClick = onClick,
 		onLongClick = onLongClick,
 		shapes = ListItemDefaults.segmentedShapes(

@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
@@ -189,7 +188,7 @@ fun SearchScreen(
 										stringResource(Res.string.title_songs),
 										style = MaterialTheme.typography.headlineSmall,
 										modifier = Modifier.padding(
-											horizontal = 20.dp,
+											horizontal = 16.dp,
 											vertical = 8.dp
 										)
 									)
@@ -226,7 +225,6 @@ fun SearchScreen(
 												model = model,
 												contentDescription = null,
 												modifier = Modifier
-													.padding(start = 6.5.dp)
 													.size(50.dp)
 													.clip(MaterialTheme.shapes.small),
 												contentScale = ContentScale.Crop
