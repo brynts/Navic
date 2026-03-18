@@ -1,6 +1,7 @@
 package paige.navic.ui.components.layouts
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.fadeIn
@@ -20,13 +21,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -87,22 +88,36 @@ fun PlayerBar(
 	val spec = MaterialTheme.motionScheme.defaultSpatialSpec<Dp>()
 	val effectsSpec = MaterialTheme.motionScheme.defaultEffectsSpec<Dp>()
 
+	val containerColor by animateColorAsState(
+		if (isSystemInDarkTheme() || (!isSystemInDarkTheme() && !detached))
+			if (detached)
+				MaterialTheme.colorScheme.surfaceContainer
+			else MaterialTheme.colorScheme.surfaceContainerHigh
+		else MaterialTheme.colorScheme.surface,
+		MaterialTheme.motionScheme.defaultSpatialSpec()
+	)
 	val outerPadding by animateDpAsState(
 		if (detached) 12.dp else 0.dp, effectsSpec
 	)
-	val contentPadding by animateDpAsState(
+	val contentPaddingHorizontal by animateDpAsState(
+		if (detached) 10.dp else 16.dp, effectsSpec
+	)
+	val contentPaddingBottom by animateDpAsState(
+		if (detached) 10.dp else 12.dp, effectsSpec
+	)
+	val contentPaddingTop by animateDpAsState(
 		if (detached) 10.dp else 16.dp, effectsSpec
 	)
 	val shadowRadius by animateDpAsState(
 		if (detached) 10.dp else 8.dp, effectsSpec
 	)
 	val coverSize by animateDpAsState(
-		if (detached) 48.dp else 55.dp, spec
+		if (detached) 48.dp else 50.dp, spec
 	)
 	val coverRounding by animateDpAsState(
 		if (playerState.isLoading)
 			46.dp
-		else if (detached) 12.dp else 10.dp
+		else if (detached) 12.dp else 8.dp
 	)
 	val coverPadding by animateDpAsState(
 		if (playerState.isLoading)
@@ -115,16 +130,12 @@ fun PlayerBar(
 	val iconSpacing by animateDpAsState(
 		if (detached) 8.dp else 12.dp, effectsSpec
 	)
-	val topCornerSize by animateDpAsState(
-		if (detached) 20.dp else 18.dp, spec
-	)
-	val bottomCornerSize by animateDpAsState(
+	val cornerSize by animateDpAsState(
 		if (detached) 20.dp else 0.dp, effectsSpec
 	)
 
 	val shape = ContinuousRoundedRectangle(
-		topCornerSize, topCornerSize,
-		bottomCornerSize, bottomCornerSize
+		cornerSize
 	)
 
 	val onClick = {
@@ -172,12 +183,15 @@ fun PlayerBar(
 							}
 						)
 					},
-				contentPadding = PaddingValues(contentPadding),
+				contentPadding = PaddingValues(
+					start = contentPaddingHorizontal,
+					end = contentPaddingHorizontal,
+					top = contentPaddingTop,
+					bottom = contentPaddingBottom
+				),
 				verticalAlignment = Alignment.CenterVertically,
 				colors = ListItemDefaults.colors(
-					containerColor = if (isSystemInDarkTheme() || (!isSystemInDarkTheme() && !detached))
-						MaterialTheme.colorScheme.surfaceContainer
-					else MaterialTheme.colorScheme.surface
+					containerColor = containerColor
 				),
 				shapes = ListItemDefaults.shapes(
 					shape = shape,
@@ -232,6 +246,7 @@ fun PlayerBar(
 					Row(
 						horizontalArrangement = Arrangement.spacedBy(iconSpacing)
 					) {
+						val colors = IconButtonDefaults.iconButtonVibrantColors()
 						IconButton(
 							onClick = {
 								ctx.clickSound()
@@ -241,7 +256,8 @@ fun PlayerBar(
 									player.pause()
 								}
 							},
-							enabled = enabled
+							enabled = enabled,
+							colors = colors
 						) {
 							val painter = playPauseIconPainter(playerState.isPaused)
 							if (painter != null) {
@@ -265,7 +281,8 @@ fun PlayerBar(
 								ctx.clickSound()
 								player.next()
 							},
-							enabled = enabled
+							enabled = enabled,
+							colors = colors
 						) {
 							Icon(
 								imageVector = Icons.Filled.SkipNext,
@@ -282,9 +299,7 @@ fun PlayerBar(
 				},
 				supportingContent = {
 					if (track != null) {
-						track.artistName?.let { artist ->
-							MarqueeText(artist)
-						}
+						MarqueeText(track.artistName)
 					} else {
 						MarqueeText(stringResource(Res.string.info_not_playing))
 					}
@@ -298,16 +313,23 @@ fun PlayerBar(
 				val progress by animateFloatAsState(
 					playerState.progress.coerceIn(0f, 1f)
 				)
+				val alignment = if (detached) Alignment.BottomStart else Alignment.TopStart
 				Box(
 					modifier = Modifier
 						.matchParentSize()
 						.clip(shape)
-						.align(Alignment.BottomStart),
-					contentAlignment = Alignment.BottomStart
+						.align(alignment),
+					contentAlignment = alignment
 				) {
+					if (!detached) {
+						Box(Modifier
+							.background(MaterialTheme.colorScheme.surfaceBright)
+							.fillMaxWidth()
+							.height(3.dp))
+					}
 					Box(
 						Modifier
-							.background(MaterialTheme.colorScheme.onSurface.copy(alpha = alpha))
+							.background(MaterialTheme.colorScheme.primary.copy(alpha = alpha))
 							.fillMaxWidth(if (track != null) progress else 0f)
 							.height(3.dp)
 					)
