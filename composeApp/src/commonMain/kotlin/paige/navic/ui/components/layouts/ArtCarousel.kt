@@ -1,8 +1,6 @@
 package paige.navic.ui.components.layouts
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -16,20 +14,13 @@ import androidx.compose.material3.carousel.CarouselItemScope
 import androidx.compose.material3.carousel.HorizontalMultiBrowseCarousel
 import androidx.compose.material3.carousel.rememberCarouselState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import coil3.compose.AsyncImage
-import coil3.compose.LocalPlatformContext
-import coil3.request.CachePolicy
-import coil3.request.ImageRequest
-import coil3.request.crossfade
 import paige.navic.LocalCtx
-import paige.navic.data.session.SessionManager
-import paige.navic.data.session.SessionManager.getCoverArtUrl
+import paige.navic.ui.components.common.CoverArt
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -68,35 +59,24 @@ fun <T> ArtCarousel(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CarouselItemScope.ArtCarouselItem(
-	coverArt: String?,
+	coverArtId: String?,
 	contentDescription: String?,
 	onClick: () -> Unit = {}
 ) {
 	val ctx = LocalCtx.current
 	val focusManager = LocalFocusManager.current
-	val platformContext = LocalPlatformContext.current
-	val model = remember(coverArt) {
-		ImageRequest.Builder(platformContext)
-			.data(SessionManager.api.getCoverArtUrl(coverArt))
-			.memoryCacheKey(coverArt)
-			.diskCacheKey(coverArt)
-			.diskCachePolicy(CachePolicy.ENABLED)
-			.memoryCachePolicy(CachePolicy.ENABLED)
-			.crossfade(500)
-			.build()
-	}
-	AsyncImage(
-		model = model,
+	CoverArt(
+		coverArtId = coverArtId,
 		contentDescription = contentDescription,
 		modifier = Modifier
 			.fillMaxWidth()
-			.aspectRatio(1f)
-			.maskClip(MaterialTheme.shapes.large)
-			.clickable {
-				ctx.clickSound()
-				focusManager.clearFocus(true)
-				onClick()
-			},
-		contentScale = ContentScale.Crop
+			.maskClip(MaterialTheme.shapes.large),
+		shape = RectangleShape,
+		onClick = {
+			ctx.clickSound()
+			focusManager.clearFocus(true)
+			onClick()
+		},
+		enabled = true
 	)
 }

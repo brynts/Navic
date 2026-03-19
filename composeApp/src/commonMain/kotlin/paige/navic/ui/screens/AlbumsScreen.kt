@@ -270,7 +270,7 @@ fun AlbumsScreenItem(
 				backStack.add(Screen.Tracks(album, tab))
 			},
 			onLongClick = { viewModel.selectAlbum(album) },
-			coverArt = album.coverArtId,
+			coverArtId = album.coverArtId,
 			title = album.name,
 			subtitle = album.artistName,
 			id = album.id,

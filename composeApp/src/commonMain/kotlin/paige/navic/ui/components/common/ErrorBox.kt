@@ -62,6 +62,9 @@ fun ErrorBox(
 		animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec()
 	)
 	var copied by remember { mutableStateOf(false) }
+	LaunchedEffect(error.error) {
+		error.error.printStackTrace()
+	}
 	LaunchedEffect(copied) {
 		if (copied) {
 			delay(2000)

@@ -57,7 +57,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.LinkAnnotation
@@ -66,11 +66,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil3.compose.AsyncImage
-import coil3.compose.LocalPlatformContext
-import coil3.request.CachePolicy
-import coil3.request.ImageRequest
-import coil3.request.crossfade
 import navic.composeapp.generated.resources.Res
 import navic.composeapp.generated.resources.action_more
 import navic.composeapp.generated.resources.action_play
@@ -87,13 +82,12 @@ import paige.navic.LocalMediaPlayer
 import paige.navic.LocalNavStack
 import paige.navic.data.models.Screen
 import paige.navic.data.models.settings.Settings
-import paige.navic.data.session.SessionManager
-import paige.navic.data.session.SessionManager.getCoverArtUrl
 import paige.navic.icons.Icons
 import paige.navic.icons.brand.Lastfm
 import paige.navic.icons.brand.Musicbrainz
 import paige.navic.icons.filled.Play
 import paige.navic.icons.outlined.MoreVert
+import paige.navic.ui.components.common.CoverArt
 import paige.navic.ui.components.common.Dropdown
 import paige.navic.ui.components.common.DropdownItem
 import paige.navic.ui.components.common.ErrorBox
@@ -175,7 +169,7 @@ fun ArtistScreen(
 						) {
 							ArtistScreenHeader(
 								artistName = state.artist.name,
-								coverArt = state.artist.coverArtId,
+								coverArtId = state.artist.coverArtId,
 								subtitle = (artistState as? UiState.Success)?.data?.info?.biography,
 								lastfm = (artistState as? UiState.Success)?.data?.info?.lastFmUrl,
 								innerPadding = contentPadding,
@@ -259,7 +253,7 @@ fun ArtistScreen(
 												ctx.clickSound()
 												backStack.add(Screen.Artist(artist.id))
 											},
-											coverArt = artist.coverArtId,
+											coverArtId = artist.coverArtId,
 											title = artist.name,
 											subtitle = pluralStringResource(
 												Res.plurals.count_albums,
@@ -293,7 +287,7 @@ fun truncateText(text: String, limit: Int): String {
 @Composable
 private fun ArtistScreenHeader(
 	artistName: String,
-	coverArt: String?,
+	coverArtId: String?,
 	subtitle: String?,
 	lastfm: String?,
 	innerPadding: PaddingValues,
@@ -304,17 +298,6 @@ private fun ArtistScreenHeader(
 ) {
 	val ctx = LocalCtx.current
 	val layoutDirection = LocalLayoutDirection.current
-	val platformContext = LocalPlatformContext.current
-	val model = remember(coverArt) {
-		ImageRequest.Builder(platformContext)
-			.data(SessionManager.api.getCoverArtUrl(coverArt))
-			.memoryCacheKey(coverArt)
-			.diskCacheKey(coverArt)
-			.diskCachePolicy(CachePolicy.ENABLED)
-			.memoryCachePolicy(CachePolicy.ENABLED)
-			.crossfade(500)
-			.build()
-	}
 	with(sharedTransitionScope) {
 		BoxWithConstraints(
 			modifier = Modifier.fillMaxWidth()
@@ -325,11 +308,11 @@ private fun ArtistScreenHeader(
 					.height((400.dp / (maxWidth / 300.dp)) + innerPadding.calculateTopPadding())
 					.background(MaterialTheme.colorScheme.surfaceContainer)
 			) {
-				AsyncImage(
-					model = model,
-					contentDescription = null,
-					contentScale = ContentScale.Crop,
-					modifier = Modifier.fillMaxSize()
+				CoverArt(
+					coverArtId = coverArtId,
+					modifier = Modifier.fillMaxSize(),
+					shape = RectangleShape,
+					square = false
 				)
 				Box(
 					modifier = Modifier

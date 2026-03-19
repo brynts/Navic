@@ -38,16 +38,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import coil3.compose.AsyncImage
-import coil3.compose.LocalPlatformContext
-import coil3.request.CachePolicy
-import coil3.request.ImageRequest
 import com.kyant.capsule.ContinuousRoundedRectangle
 import dev.zt64.subsonic.api.model.Share
 import kotlinx.coroutines.delay
@@ -67,11 +61,10 @@ import paige.navic.LocalCtx
 import paige.navic.LocalShareManager
 import paige.navic.LocalSnackbarState
 import paige.navic.data.models.settings.Settings
-import paige.navic.data.session.SessionManager
-import paige.navic.data.session.SessionManager.getCoverArtUrl
 import paige.navic.icons.Icons
 import paige.navic.icons.outlined.Delete
 import paige.navic.icons.outlined.Share
+import paige.navic.ui.components.common.CoverArt
 import paige.navic.ui.components.common.Dropdown
 import paige.navic.ui.components.common.DropdownItem
 import paige.navic.ui.components.dialogs.DeletionDialog
@@ -209,7 +202,11 @@ private fun SharesScreenItem(
 				ListItem(
 					modifier = modifier,
 					leadingContent = {
-						ShareCover(coverArt = share.items.firstOrNull()?.coverArtId)
+						CoverArt(
+							coverArtId = share.items.firstOrNull()?.coverArtId,
+							modifier = Modifier.size(60.dp),
+							shape = ContinuousRoundedRectangle((Settings.shared.artGridRounding / 1.5f).dp)
+						)
 					},
 					content = {
 						Text(share.description)
@@ -271,34 +268,4 @@ private fun SharesScreenItem(
 			}
 		}
 	}
-}
-
-@Composable
-private fun ShareCover(
-	modifier: Modifier = Modifier,
-	coverArt: String?
-) {
-	val platformContext = LocalPlatformContext.current
-	val artGridRounding = Settings.shared.artGridRounding
-	val model = remember(coverArt) {
-		ImageRequest.Builder(platformContext)
-			.data(SessionManager.api.getCoverArtUrl(coverArt))
-			.memoryCacheKey(coverArt)
-			.diskCacheKey(coverArt)
-			.diskCachePolicy(CachePolicy.ENABLED)
-			.memoryCachePolicy(CachePolicy.ENABLED)
-			.build()
-	}
-	AsyncImage(
-		model = model,
-		contentDescription = null,
-		contentScale = ContentScale.Crop,
-		modifier = Modifier
-			.size(60.dp)
-			.clip(
-				ContinuousRoundedRectangle((artGridRounding / 1.5f).dp)
-			)
-			.background(MaterialTheme.colorScheme.surfaceContainer)
-			.then(modifier)
-	)
 }

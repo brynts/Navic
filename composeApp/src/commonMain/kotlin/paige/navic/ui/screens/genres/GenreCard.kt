@@ -38,6 +38,7 @@ import paige.navic.data.models.settings.Settings
 import paige.navic.data.models.settings.enums.ThemeMode
 import paige.navic.data.session.SessionManager
 import paige.navic.data.session.SessionManager.getCoverArtUrl
+import paige.navic.ui.components.common.CoverArt
 import paige.navic.ui.theme.defaultFont
 import paige.navic.ui.viewmodels.GenreWithAlbums
 import kotlin.math.abs
@@ -106,30 +107,26 @@ fun GenreCard(
 		Box {
 			Box(Modifier.align(Alignment.CenterEnd)) {
 				if (firstAlbumCoverArt != null) {
-					AsyncImage(
-						model = firstModel,
-						contentDescription = null,
+					CoverArt(
+						coverArtId = firstAlbumCoverArt,
 						modifier = Modifier
 							.padding(top = 10.dp)
 							.rotate(10f)
 							.size(90.dp)
-							.offset(x = 5.dp, y = 5.dp)
-							.shadow(3.dp, MaterialTheme.shapes.medium)
-							.clip(MaterialTheme.shapes.medium),
-						contentScale = ContentScale.Crop
+							.offset(x = 5.dp, y = 5.dp),
+						shape = MaterialTheme.shapes.medium,
+						shadowElevation = 3.dp
 					)
 					if (secondAlbumCoverArt != null) {
-						AsyncImage(
-							model = secondModel,
-							contentDescription = null,
+						CoverArt(
+							coverArtId = secondAlbumCoverArt,
 							modifier = Modifier
 								.padding(top = 13.dp)
 								.rotate(25f)
 								.size(90.dp)
-								.offset(x = 25.dp, y = 15.dp)
-								.shadow(10.dp, MaterialTheme.shapes.medium)
-								.clip(MaterialTheme.shapes.medium),
-							contentScale = ContentScale.Crop
+								.offset(x = 25.dp, y = 15.dp),
+							shape = MaterialTheme.shapes.medium,
+							shadowElevation = 10.dp
 						)
 					}
 				}

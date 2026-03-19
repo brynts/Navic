@@ -43,6 +43,7 @@ import paige.navic.LocalSharedTransitionScope
 import paige.navic.data.models.settings.Settings
 import paige.navic.data.session.SessionManager
 import paige.navic.data.session.SessionManager.getCoverArtUrl
+import paige.navic.ui.components.common.CoverArt
 import paige.navic.ui.components.common.ErrorBox
 import paige.navic.utils.UiState
 import paige.navic.utils.onRightClick
@@ -80,7 +81,7 @@ fun ArtGridItem(
 	modifier: Modifier = Modifier,
 	onClick: () -> Unit,
 	onLongClick: (() -> Unit)? = null,
-	coverArt: String?,
+	coverArtId: String?,
 	title: String,
 	subtitle: String? = null,
 	id: String,
@@ -90,17 +91,6 @@ fun ArtGridItem(
 	tab: String
 ) {
 	val interactionSource = remember { MutableInteractionSource() }
-	val imageBuilder = LocalImageBuilder.current
-	val artGridRounding = Settings.shared.artGridRounding
-	val model = remember(coverArt) {
-		imageBuilder
-			.data(SessionManager.api.getCoverArtUrl(coverArt))
-			.memoryCacheKey(coverArt)
-			.diskCacheKey(coverArt)
-			.diskCachePolicy(CachePolicy.ENABLED)
-			.memoryCachePolicy(CachePolicy.ENABLED)
-			.build()
-	}
 	with(LocalSharedTransitionScope.current) {
 		Column(
 			modifier = Modifier
@@ -114,22 +104,16 @@ fun ArtGridItem(
 				.onRightClick { onLongClick?.invoke() }
 				.then(modifier)
 		) {
-			AsyncImage(
-				model = model,
+			CoverArt(
+				coverArtId = coverArtId,
 				contentDescription = title,
-				contentScale = ContentScale.Crop,
 				modifier = Modifier
 					.fillMaxWidth()
-					.aspectRatio(1f)
 					.sharedElement(
 						sharedContentState = this@with.rememberSharedContentState("${tab}-${id}-cover"),
 						animatedVisibilityScope = LocalNavAnimatedContentScope.current
-					)
-					.clip(
-						ContinuousRoundedRectangle(artGridRounding.dp)
-					)
-					.indication(interactionSource, ripple())
-					.background(MaterialTheme.colorScheme.surfaceContainer)
+					),
+				interactionSource = interactionSource
 			)
 			Text(
 				text = title,
