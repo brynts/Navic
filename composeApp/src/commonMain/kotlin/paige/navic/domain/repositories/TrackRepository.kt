@@ -16,6 +16,8 @@ import paige.navic.data.database.mappers.toDomainModel
 import paige.navic.data.database.mappers.toEntity
 import paige.navic.domain.models.DomainSongCollection
 import paige.navic.data.session.SessionManager
+import paige.navic.domain.models.DomainAlbum
+import paige.navic.domain.models.DomainPlaylist
 import paige.navic.domain.models.DomainSong
 import paige.navic.utils.UiState
 import kotlin.time.Clock
@@ -31,15 +33,27 @@ class TrackRepository(
 	private val syncManager: SyncManager,
 	private val dbRepository: DbRepository
 ) {
-	private suspend fun getLocalData(collectionId: String): DomainSongCollection {
+	suspend fun getLocalData(collectionId: String): DomainSongCollection {
 		return albumDao.getAlbumById(collectionId)?.toDomainModel()
 			?: playlistDao.getPlaylistById(collectionId)?.toDomainModel()
 			?: throw Error("Collection ID $collectionId is neither a known album or playlist")
 	}
 
 	private suspend fun refreshLocalData(collectionId: String): DomainSongCollection {
-		// TODO: only refresh this collection, not the entire library
-		dbRepository.syncLibrarySongs().getOrThrow()
+		when (val collection = getLocalData(collectionId)) {
+			is DomainAlbum -> {
+				val album = SessionManager.api.getAlbum(collection.id)
+				songDao.updateSongsByAlbumId(album.id, album.songs.map { it.toEntity() })
+				albumDao.insertAlbum(album.toEntity())
+				albumDao.getAlbumById(album.id)!!.toDomainModel()
+			}
+			is DomainPlaylist -> {
+				val playlist = SessionManager.api.getPlaylist(collection.id)
+				playlistDao.insertPlaylist(playlist.toEntity())
+				dbRepository.syncPlaylistSongs(collection.id)
+				playlistDao.getPlaylistById(playlist.id)!!.toDomainModel()
+			}
+		}
 		return getLocalData(collectionId)
 	}
 

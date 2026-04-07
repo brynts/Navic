@@ -57,7 +57,10 @@ fun TracksScreenHeadingRow(
 			enabled = true
 		)
 		Spacer(Modifier.height(10.dp))
-		Column(horizontalAlignment = Alignment.CenterHorizontally) {
+		Column(
+			modifier = Modifier.padding(horizontal = 31.dp),
+			horizontalAlignment = Alignment.CenterHorizontally
+		) {
 			Text(
 				collection.name,
 				style = MaterialTheme.typography.headlineSmall,

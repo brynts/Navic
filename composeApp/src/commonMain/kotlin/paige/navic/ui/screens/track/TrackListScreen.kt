@@ -28,12 +28,11 @@ import paige.navic.data.database.entities.DownloadStatus
 import paige.navic.data.models.settings.Settings
 import paige.navic.data.models.settings.enums.BottomBarVisibilityMode
 import paige.navic.domain.models.DomainAlbum
-import paige.navic.domain.models.DomainSongCollection
 import paige.navic.icons.Icons
 import paige.navic.icons.outlined.Note
 import paige.navic.shared.MediaPlayerViewModel
 import paige.navic.ui.components.common.ContentUnavailable
-import paige.navic.ui.components.common.ErrorBox
+import paige.navic.ui.components.common.ErrorSnackbar
 import paige.navic.ui.screens.share.dialogs.ShareDialog
 import paige.navic.ui.components.layouts.RootBottomBar
 import paige.navic.ui.screens.track.components.TrackRowDropdown
@@ -53,17 +52,18 @@ import kotlin.time.Duration
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrackListScreen(
-	collection: DomainSongCollection,
+	collectionId: String,
 	tab: String
 ) {
 	val viewModel = koinViewModel<TrackListViewModel>(
-		key = collection.id,
-		parameters = { parametersOf(collection) }
+		key = collectionId,
+		parameters = { parametersOf(collectionId) }
 	)
 
 	val player = koinViewModel<MediaPlayerViewModel>()
 
 	val collectionState by viewModel.collectionState.collectAsState()
+	val collection = collectionState.data
 	val selection by viewModel.selectedTrack.collectAsState()
 	val isOnline by viewModel.isOnline.collectAsState()
 
@@ -74,7 +74,8 @@ fun TrackListScreen(
 	val starredState by viewModel.starredState.collectAsState()
 	val otherAlbums by viewModel.otherAlbums.collectAsState()
 	val allDownloads by viewModel.allDownloads.collectAsState()
-	val downloadStatus by viewModel.collectionDownloadStatus().collectAsState(DownloadStatus.NOT_DOWNLOADED)
+	val downloadStatus by viewModel.collectionDownloadStatus()
+		.collectAsState(DownloadStatus.NOT_DOWNLOADED)
 
 	val scrolled by remember {
 		derivedStateOf {
@@ -118,18 +119,14 @@ fun TrackListScreen(
 				contentPadding = contentPadding.withoutTop(),
 				state = viewModel.listState
 			) {
+				if (collection == null) return@LazyColumn
+
 				item {
 					TracksScreenHeadingRow(
 						collection = collection,
 						tab = tab,
 						scrolled = scrolled
 					)
-				}
-
-				val error = (collectionState as? UiState.Error)
-				if (error != null) {
-					item { ErrorBox(error) }
-					return@LazyColumn
 				}
 
 				item {
@@ -197,6 +194,11 @@ fun TrackListScreen(
 			}
 		}
 	}
+
+	ErrorSnackbar(
+		error = (collectionState as? UiState.Error)?.error,
+		onClearError = { viewModel.clearError() }
+	)
 
 	@Suppress("AssignedValueIsNeverRead")
 	ShareDialog(

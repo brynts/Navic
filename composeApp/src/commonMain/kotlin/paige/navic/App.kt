@@ -260,7 +260,7 @@ private fun entryProvider(
 			QueueScreen()
 		}
 		entry<Screen.TrackList>(metadata = detailPane("root")) { key ->
-			TrackListScreen(key.collection, key.tab)
+			TrackListScreen(key.collectionId, key.tab)
 		}
 		entry<Screen.TrackDetail>(metadata = detailPane("root")) { key ->
 			TrackDetailScreen(key.songId)

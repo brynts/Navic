@@ -19,6 +19,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import kotlinx.collections.immutable.toPersistentList
 import navic.composeapp.generated.resources.Res
@@ -49,7 +50,7 @@ import paige.navic.utils.UiState
 
 @Composable
 fun TracksScreenTopBar(
-	collection: DomainSongCollection,
+	collection: DomainSongCollection?,
 	albumInfoState: UiState<DomainAlbumInfo>,
 	scrolled: Boolean,
 	onSetShareId: (shareId: String?) -> Unit,
@@ -68,7 +69,11 @@ fun TracksScreenTopBar(
 				enter = scaleIn() + fadeIn(),
 				exit = scaleOut() + fadeOut()
 			) {
-				Text(collection.name)
+				Text(
+					text = collection?.name.orEmpty(),
+					maxLines = 1,
+					overflow = TextOverflow.Ellipsis
+				)
 			}
 		},
 		actions = {
@@ -119,7 +124,7 @@ fun TracksScreenTopBar(
 						containerColor = MaterialTheme.colorScheme.surfaceContainerHighest,
 						onClick = {
 							expanded = false
-							onSetShareId(collection.id)
+							onSetShareId(collection?.id)
 						},
 					)
 					DropdownItem(
@@ -168,7 +173,7 @@ fun TracksScreenTopBar(
 	if (playlistDialogShown) {
 		@Suppress("AssignedValueIsNeverRead")
 		PlaylistUpdateDialog(
-			tracks = collection.songs.toPersistentList(),
+			tracks = collection?.songs.orEmpty().toPersistentList(),
 			onDismissRequest = { playlistDialogShown = false }
 		)
 	}
