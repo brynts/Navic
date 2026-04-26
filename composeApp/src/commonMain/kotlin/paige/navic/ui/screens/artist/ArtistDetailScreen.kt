@@ -91,7 +91,6 @@ import paige.navic.ui.screens.playlist.dialogs.PlaylistUpdateDialog
 import paige.navic.ui.screens.share.dialogs.ShareDialog
 import paige.navic.utils.LocalBottomBarScrollManager
 import paige.navic.utils.UiState
-import paige.navic.utils.fadeFromTop
 import kotlin.time.Duration
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3ExpressiveApi::class)
@@ -243,8 +242,7 @@ fun ArtistDetailScreen(
 									end = contentPadding.calculateEndPadding(
 										layoutDirection
 									)
-								)
-								.fadeFromTop(),
+								),
 							verticalArrangement = Arrangement.spacedBy(12.dp),
 							horizontalAlignment = Alignment.CenterHorizontally
 						) {
